@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>MIK ZID Villa — Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{--bg:#0f1c2e;--card:rgba(255,255,255,.06);--br:rgba(255,255,255,.12);--txt:rgba(255,255,255,.92);--muted:rgba(255,255,255,.62);--gold:#e59334;--ok:#22c55e;--warn:#f59e0b;--bad:#ef4444;--chip:rgba(255,255,255,.08);}
+    *{box-sizing:border-box;}
+    body{margin:0;font-family:Montserrat,system-ui,-apple-system,Segoe UI,Roboto,Arial;background:radial-gradient(1200px 900px at 20% 20%, #243c62, var(--bg));color:var(--txt);min-height:100vh;padding:28px;}
+    .wrap{max-width:1200px;margin:0 auto;}
+    .top{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:18px;}
+    .brand{display:flex;flex-direction:column;gap:4px;}
+    .brand h1{margin:0;font-size:20px;letter-spacing:.8px;}
+    .brand p{margin:0;color:var(--muted);font-size:12px;}
+    .row{display:flex;gap:12px;flex-wrap:wrap;align-items:center;}
+    .card{background:var(--card);border:1px solid var(--br);border-radius:14px;padding:14px;backdrop-filter:blur(8px);}
+    input,select,button{font:inherit;border-radius:12px;border:1px solid var(--br);background:rgba(255,255,255,.06);color:var(--txt);padding:10px 12px;outline:none;}
+    input::placeholder{color:rgba(255,255,255,.45);}
+    button{cursor:pointer;border-color:rgba(229,147,52,.35);background:rgba(229,147,52,.14);font-weight:700;letter-spacing:.4px;}
+    button:hover{background:rgba(229,147,52,.22);}
+    .btn2{border-color:var(--br);background:rgba(255,255,255,.06);font-weight:600;}
+    .btn2:hover{background:rgba(255,255,255,.10);}
+    .badge{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;font-weight:700;font-size:12px;background:var(--chip);border:1px solid var(--br);text-transform:uppercase;letter-spacing:1px;}
+    .ok{border-color:rgba(34,197,94,.45);background:rgba(34,197,94,.10);color:#b7f7c9;}
+    .warn{border-color:rgba(245,158,11,.45);background:rgba(245,158,11,.12);color:#ffe1a8;}
+    .bad{border-color:rgba(239,68,68,.45);background:rgba(239,68,68,.10);color:#ffb4b4;}
+    table{width:100%;border-collapse:collapse;overflow:hidden;border-radius:14px;}
+    th,td{padding:10px;border-bottom:1px solid rgba(255,255,255,.08);vertical-align:top;font-size:13px;}
+    th{color:rgba(255,255,255,.8);text-align:left;font-size:12px;letter-spacing:.8px;text-transform:uppercase;background:rgba(255,255,255,.04);position:sticky;top:0;z-index:1;}
+    tr:hover td{background:rgba(255,255,255,.03);}
+    .small{color:var(--muted);font-size:12px;}
+    .actions{display:flex;gap:8px;flex-wrap:wrap;}
+    .pill{padding:7px 10px;border-radius:10px;border:1px solid var(--br);background:rgba(255,255,255,.06);cursor:pointer;}
+    .pill.ok{border-color:rgba(34,197,94,.45);background:rgba(34,197,94,.10);}
+    .pill.bad{border-color:rgba(239,68,68,.45);background:rgba(239,68,68,.10);}
+    .pill.warn{border-color:rgba(245,158,11,.45);background:rgba(245,158,11,.12);}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+    @media (max-width:900px){.grid2{grid-template-columns:1fr;}}
+    .notice{margin-top:10px;color:var(--muted);font-size:12px;}
+    .dangerNote{color:#ffd2d2;}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div class="brand">
+      <h1>MIK ZID Villa — Admin Panel</h1>
+      <p>Manage inquiries, confirm bookings, and block dates. (Keep this link private.)</p>
+    </div>
+    <div class="row"><span class="badge warn" id="statusBadge">Not Connected</span></div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <div class="row" style="justify-content:space-between;">
+        <div>
+          <div style="font-weight:700;">Login</div>
+          <div class="small">Admin password is stored only in this browser session.</div>
+        </div>
+      </div>
+      <div class="row" style="margin-top:10px;">
+        <input id="apiBase" placeholder="Worker URL (API_BASE)" style="min-width:320px;flex:1;" />
+        <input id="adminToken" type="password" placeholder="Admin Password" style="min-width:220px;flex:1;" />
+        <button id="saveBtn">Save</button>
+        <button class="btn2" id="logoutBtn">Logout</button>
+      </div>
+      <div class="notice dangerNote">Tip: Use a strong password. Anyone with it can manage bookings.</div>
+    </div>
+
+    <div class="card">
+      <div style="font-weight:700;">Quick Actions</div>
+      <div class="row" style="margin-top:10px;">
+        <select id="filterStatus">
+          <option value="">All</option>
+          <option value="inquiry">Inquiry</option>
+          <option value="confirmed">Confirmed</option>
+          <option value="blocked">Blocked</option>
+          <option value="cancelled">Cancelled</option>
+        </select>
+        <button id="refreshBtn">Refresh</button>
+      </div>
+      <div class="notice">Notifications: new inquiry + payment updates are sent to Telegram (and you can later add WhatsApp).</div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:12px;">
+    <div class="row" style="justify-content:space-between;">
+      <div>
+        <div style="font-weight:700;">Bookings & Inquiries</div>
+        <div class="small">Actions change availability instantly on the website.</div>
+      </div>
+      <div class="row"><span class="badge" id="countBadge">0</span></div>
+    </div>
+
+    <div style="overflow:auto;margin-top:10px;max-height:65vh;border-radius:14px;">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th><th>Dates</th><th>Guest</th><th>Guests</th><th>Payment</th><th>Status</th><th>Notes</th><th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+  const statusBadge=document.getElementById("statusBadge");
+  const countBadge=document.getElementById("countBadge");
+  const tbody=document.getElementById("tbody");
+  const apiBaseEl=document.getElementById("apiBase");
+  const adminTokenEl=document.getElementById("adminToken");
+  const filterStatus=document.getElementById("filterStatus");
+
+  function setBadge(state,text){statusBadge.classList.remove("ok","warn","bad");statusBadge.classList.add(state);statusBadge.textContent=text;}
+  function getCfg(){return{apiBase:sessionStorage.getItem("MZ_API_BASE")||"",token:sessionStorage.getItem("MZ_ADMIN_TOKEN")||""};}
+  function setCfg(apiBase,token){sessionStorage.setItem("MZ_API_BASE",apiBase);sessionStorage.setItem("MZ_ADMIN_TOKEN",token);}
+  function clearCfg(){sessionStorage.removeItem("MZ_API_BASE");sessionStorage.removeItem("MZ_ADMIN_TOKEN");}
+  function escapeHtml(s){return String(s??"").replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+  function fmtStatus(s){const v=String(s||"").toLowerCase();if(v==="confirmed")return`<span class="badge ok">confirmed</span>`;if(v==="blocked")return`<span class="badge bad">blocked</span>`;if(v==="cancelled")return`<span class="badge bad">cancelled</span>`;return`<span class="badge warn">${escapeHtml(v||"unknown")}</span>`;}
+  function fmtPay(r){const pm=r.payment_method||"pay_later";const ps=r.payment_status||"unpaid";const pmB=pm==="pay_online"?`<span class="badge warn">online</span>`:`<span class="badge">later</span>`;let psB=`<span class="badge warn">${escapeHtml(ps)}</span>`;if(ps==="paid")psB=`<span class="badge ok">paid</span>`;if(ps==="failed")psB=`<span class="badge bad">failed</span>`;return`${pmB}<div class="small" style="margin-top:6px;">${psB}</div>`;}
+
+  async function api(path,opts={}){
+    const cfg=getCfg();
+    if(!cfg.apiBase||!cfg.token)throw new Error("Missing API base or admin token");
+    const res=await fetch(cfg.apiBase.replace(/\/$/,"")+path,{...opts,headers:{...(opts.headers||{}),"Content-Type":"application/json","X-Admin-Token":cfg.token}});
+    const data=await res.json().catch(()=> ({}));
+    if(!res.ok)throw new Error(data.error||data.detail||("HTTP "+res.status));
+    return data;
+  }
+
+  function rowHtml(r){
+    const guest=`<div style="font-weight:700;">${escapeHtml(r.name||"")}</div><div class="small">${escapeHtml(r.email||"")}</div><div class="small">${escapeHtml(r.phone||"")}</div>`;
+    const dates=`<div style="font-weight:700;">${escapeHtml(r.checkin)} → ${escapeHtml(r.checkout)}</div><div class="small">${escapeHtml(r.created_at||"")}</div>`;
+    const notes=`<div class="small">${escapeHtml(r.message||"")}</div>`;
+    const actions=`<div class="actions">
+      <span class="pill ok" data-act="confirm" data-id="${r.id}">Confirm</span>
+      <span class="pill warn" data-act="inquiry" data-id="${r.id}">Inquiry</span>
+      <span class="pill bad" data-act="block" data-id="${r.id}">Block</span>
+      <span class="pill bad" data-act="cancel" data-id="${r.id}">Cancel</span>
+      <span class="pill" data-act="markPaid" data-id="${r.id}">Mark Paid</span>
+    </div>`;
+    return `<tr><td>${r.id}</td><td>${dates}</td><td>${guest}</td><td>${r.guests??""}</td><td>${fmtPay(r)}</td><td>${fmtStatus(r.status)}</td><td>${notes}</td><td>${actions}</td></tr>`;
+  }
+
+  function wireRowButtons(){
+    document.querySelectorAll("[data-act]").forEach(btn=>{
+      btn.addEventListener("click", async ()=>{
+        const id=btn.getAttribute("data-id"); const act=btn.getAttribute("data-act");
+        try{
+          setBadge("warn","Saving…");
+          if(act==="confirm") await api(`/admin/bookings/${id}`,{method:"PATCH",body:JSON.stringify({status:"confirmed"})});
+          if(act==="inquiry") await api(`/admin/bookings/${id}`,{method:"PATCH",body:JSON.stringify({status:"inquiry"})});
+          if(act==="block") await api(`/admin/bookings/${id}`,{method:"PATCH",body:JSON.stringify({status:"blocked"})});
+          if(act==="cancel") await api(`/admin/bookings/${id}`,{method:"PATCH",body:JSON.stringify({status:"cancelled"})});
+          if(act==="markPaid") await api(`/admin/bookings/${id}`,{method:"PATCH",body:JSON.stringify({payment_status:"paid"})});
+          await load();
+        }catch(e){ setBadge("bad","Error"); alert(e.message); }
+      });
+    });
+  }
+
+  async function load(){
+    const cfg=getCfg(); apiBaseEl.value=cfg.apiBase; adminTokenEl.value=cfg.token?"********":"";
+    if(!cfg.apiBase||!cfg.token){ setBadge("warn","Not Connected"); tbody.innerHTML=""; countBadge.textContent="0"; return; }
+    setBadge("warn","Loading…");
+    try{
+      const qs=new URLSearchParams(); if(filterStatus.value) qs.set("status",filterStatus.value);
+      const data=await api("/admin/bookings?"+qs.toString(),{method:"GET"});
+      const rows=data.rows||[];
+      countBadge.textContent=rows.length;
+      tbody.innerHTML=rows.map(rowHtml).join("");
+      setBadge("ok","Connected");
+      wireRowButtons();
+    }catch(e){ setBadge("bad","Error"); tbody.innerHTML=`<tr><td colspan="8">${escapeHtml(e.message)}</td></tr>`; }
+  }
+
+  document.getElementById("saveBtn").addEventListener("click", ()=>{const apiBase=apiBaseEl.value.trim(); const token=adminTokenEl.value.trim(); if(!apiBase||!token){alert("Enter Worker URL and Admin Password."); return;} setCfg(apiBase,token); load();});
+  document.getElementById("logoutBtn").addEventListener("click", ()=>{clearCfg(); apiBaseEl.value=""; adminTokenEl.value=""; load();});
+  document.getElementById("refreshBtn").addEventListener("click", load);
+  filterStatus.addEventListener("change", load);
+
+  load();
+</script>
+</body>
+</html>
